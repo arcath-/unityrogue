@@ -20,9 +20,9 @@
 SOURCE_FOLDER=Assets/Sprites
 
 // Output sprite texture width and height. If all sprites cannot fit in this space then the sprite pack
-// generation will fail.
-OUTPUT_WIDTH=512
-OUTPUT_HEIGHT=512
+// generation will fail..
+OUTPUT_WIDTH=256
+OUTPUT_HEIGHT=256
 
 // Trim whitespace from sprites to save on texture space. If in doubt set this to true, you would only
 // want to skip trimming in some rare specific cases.

@@ -11,8 +11,21 @@ namespace Othaura {
     /// </summary>
     public class RoguelikeGame : RB.IRetroBlitGame {
 
-        private Vector2i mPlayerPos;        
         public Assets assets = new Assets();
+
+        private Entity mPlayer;
+        private Entity mNPC;
+        private List<Entity> mEntities;
+
+        private GameMap mGameMap; 
+
+        private Camera mCamera;       
+
+        // refactor these into C.cs
+        private const int ROOM_MIN_SIZE = 6;
+        private const int ROOM_MAX_SIZE = 10;
+        private const int MAX_ROOMS = 30;
+
 
         /// <summary>
         /// Query hardware. Here you initialize your retro game hardware.
@@ -40,13 +53,52 @@ namespace Othaura {
         /// <returns>Return true if successful</returns>
         public bool Initialize() {    
 
-            assets.LoadAll();      
+            assets.LoadAll();
+
+            // You can load a spritesheet here
+            RB.SpriteSheetSet(assets.spriteSheet);
+
+            var rand = new System.Random();
+            UnityEngine.Random.InitState(rand.Next());
 
             C.SCREEN_WIDTH = RB.DisplaySize.width / assets.spriteSheet.grid.cellSize.width;
             C.SCREEN_HEIGHT = RB.DisplaySize.height / assets.spriteSheet.grid.cellSize.height;
 
-            mPlayerPos = new Vector2i(C.SCREEN_WIDTH / 2, C.SCREEN_HEIGHT / 2);
+            //why are these /2?
+            mPlayer = new Entity(new Vector2i (C.SCREEN_WIDTH/2, C.SCREEN_HEIGHT/2), S.HERO1, Color.white);
+            mNPC = new Entity(new Vector2i (C.SCREEN_WIDTH/2, C.SCREEN_HEIGHT/2), S.HERO2, Color.white);
 
+            mEntities = new List<Entity>();
+            mEntities.Add(mPlayer);
+            mEntities.Add(mNPC);
+
+            // make the map
+            mGameMap = new GameMap(new Vector2i(C.MAP_WIDTH, C.MAP_HEIGHT));
+            mGameMap.MakeMap(MAX_ROOMS, ROOM_MIN_SIZE, ROOM_MAX_SIZE, C.MAP_WIDTH, C.MAP_HEIGHT, mPlayer);
+
+            // set the camera 
+            mCamera = new Camera();
+            mCamera.SetPos(mPlayer);
+
+            // Temporarily place enemy somewhere valid
+            int attempts = 1000;
+            while (attempts > 0)
+            {
+                var pos = new Vector2i(UnityEngine.Random.Range(0, C.MAP_WIDTH), UnityEngine.Random.Range(0, C.MAP_HEIGHT));
+                var tile = RB.MapDataGet<Tile>(C.LAYER_TERRAIN, pos);
+                if (tile != null && tile.blocked == false && pos != mPlayer.pos)
+                {
+                    mNPC.pos = pos;
+                    break;
+                }
+
+                attempts--;
+            }
+
+
+            //Setting the map sprite sheets according to layer.   
+            RB.MapLayerSpriteSheetSet(C.LAYER_TERRAIN, assets.spriteSheet); 
+            
             // Collect any garbage created during initilization to avoid a performance hiccup later.
             System.GC.Collect();
 
@@ -58,27 +110,60 @@ namespace Othaura {
         /// Update, your game logic should live here. Update is called at a fixed interval of 60 times per second.
         /// </summary>
         ///
-        public void Update() {
-
+        public void Update() {            
+            
             if (RB.KeyDown(KeyCode.Escape)) {
                 Application.Quit();
             }
 
+            Vector2i delta = Vector2i.zero;
+
+            //Player movement
             if (RB.KeyDown(KeyCode.W) || RB.KeyDown(KeyCode.Keypad8)) {
-                mPlayerPos.y--;
+                delta.y--;
             }
 
             else if (RB.KeyDown(KeyCode.S) || RB.KeyDown(KeyCode.Keypad2)) {
-                mPlayerPos.y++;
+                delta.y++;
             }
 
             else if (RB.KeyDown(KeyCode.A) || RB.KeyDown(KeyCode.Keypad4)) {
-                mPlayerPos.x--;
+                delta.x--;
             }
 
             else if (RB.KeyDown(KeyCode.D) || RB.KeyDown(KeyCode.Keypad6)) {
-                mPlayerPos.x++;
+                delta.x++;
             }
+
+            else if (RB.KeyDown(KeyCode.Q) || RB.KeyDown(KeyCode.Keypad7)) {
+                delta.x--;
+                delta.y--;
+            }
+
+            else if (RB.KeyDown(KeyCode.E) || RB.KeyDown(KeyCode.Keypad9)) {
+                delta.x++;
+                delta.y--;
+            }
+
+            else if (RB.KeyDown(KeyCode.Z) || RB.KeyDown(KeyCode.Keypad1)) {
+                delta.x--;
+                delta.y++;
+            }
+
+            else if (RB.KeyDown(KeyCode.C) || RB.KeyDown(KeyCode.Keypad3)) {
+                delta.x++;
+                delta.y++;
+            }
+
+            // Only move if way is clear
+            if (!mGameMap.IsBlocked(mPlayer.pos + delta))
+            {
+                mPlayer.Move(delta);
+            }
+
+            mCamera.Follow(mPlayer);
+
+
         }
 
         /// <summary>
@@ -87,15 +172,9 @@ namespace Othaura {
         public void Render() {
 
             RB.Clear(new Color32(0x47, 0x2d, 0x3c, 255));
-
-            //RB.DrawSprite(Sprite.HERO, new Vector2i(mPlayerPos.x * RB.SpriteSize(0).width, mPlayerPos.y * RB.SpriteSize(0).width));
-           
-            //draw character
-            //var position = new Vector2i(mPlayerPos.x * assets.spriteSheet.grid.cellSize.width, mPlayerPos.y * assets.spriteSheet.grid.cellSize.height);
-            var position = new Vector2i(mPlayerPos.x * 6, mPlayerPos.y * 6);
-            
-            //draw the sprite
-            RB.DrawSprite(S.HERO2, position);
+                     
+            mCamera.Apply();
+            RenderFunctions.RenderAll(mEntities);
             
         }
     }

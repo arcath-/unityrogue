@@ -16,9 +16,11 @@ namespace Othaura {
         public void LoadAll() {
 
             spriteSheet.Load("SpritePack", SpriteSheetAsset.SheetType.SpritePack);
-            //spriteSheet.grid = new SpriteGrid(new Vector2i(24, 24));
+            spriteSheet.grid = new SpriteGrid(new Vector2i(24, 24));
 
-            RB.SpriteSheetSet(spriteSheet);            
+            RB.SpriteSheetSet(spriteSheet);
+
+                
         }
     }
 }
