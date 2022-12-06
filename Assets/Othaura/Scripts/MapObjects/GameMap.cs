@@ -39,7 +39,7 @@ namespace Othaura {
         public void MakeMap(int maxRooms, int roomMinSize, int roomMaxSize, int mapWidth, int mapHeight, Entity player) {
 
             List<Rect2i> rooms = new List<Rect2i>();
-
+            
             for (int r = 0; r < maxRooms; r++) {
 
                 // Random width and height

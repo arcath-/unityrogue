@@ -33,7 +33,7 @@ namespace Othaura {
         /// <summary>
         /// old values were calling RB.SpriteSize(0).width and .height but not sure why. changed to static 6
         /// </summary>
-        public static int MOVE_MULTIPLE = 3;
+        public static int MOVE_MULTIPLE = 24;
 
     }
 }

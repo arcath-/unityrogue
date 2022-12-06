@@ -75,6 +75,7 @@ namespace Othaura {
             // make the map
             mGameMap = new GameMap(new Vector2i(C.MAP_WIDTH, C.MAP_HEIGHT));
             mGameMap.MakeMap(MAX_ROOMS, ROOM_MIN_SIZE, ROOM_MAX_SIZE, C.MAP_WIDTH, C.MAP_HEIGHT, mPlayer);
+            
 
             // set the camera 
             mCamera = new Camera();
@@ -112,45 +113,45 @@ namespace Othaura {
         ///
         public void Update() {            
             
-            if (RB.KeyDown(KeyCode.Escape)) {
+            if (RB.KeyPressed(KeyCode.Escape)) {
                 Application.Quit();
             }
 
             Vector2i delta = Vector2i.zero;
 
             //Player movement
-            if (RB.KeyDown(KeyCode.W) || RB.KeyDown(KeyCode.Keypad8)) {
+            if (RB.KeyPressed(KeyCode.W) || RB.KeyPressed(KeyCode.Keypad8)) {
                 delta.y--;
             }
 
-            else if (RB.KeyDown(KeyCode.S) || RB.KeyDown(KeyCode.Keypad2)) {
+            else if (RB.KeyPressed(KeyCode.S) || RB.KeyPressed(KeyCode.Keypad2)) {
                 delta.y++;
             }
 
-            else if (RB.KeyDown(KeyCode.A) || RB.KeyDown(KeyCode.Keypad4)) {
+            else if (RB.KeyPressed(KeyCode.A) || RB.KeyPressed(KeyCode.Keypad4)) {
                 delta.x--;
             }
 
-            else if (RB.KeyDown(KeyCode.D) || RB.KeyDown(KeyCode.Keypad6)) {
+            else if (RB.KeyPressed(KeyCode.D) || RB.KeyPressed(KeyCode.Keypad6)) {
                 delta.x++;
             }
 
-            else if (RB.KeyDown(KeyCode.Q) || RB.KeyDown(KeyCode.Keypad7)) {
+            else if (RB.KeyPressed(KeyCode.Q) || RB.KeyPressed(KeyCode.Keypad7)) {
                 delta.x--;
                 delta.y--;
             }
 
-            else if (RB.KeyDown(KeyCode.E) || RB.KeyDown(KeyCode.Keypad9)) {
+            else if (RB.KeyPressed(KeyCode.E) || RB.KeyPressed(KeyCode.Keypad9)) {
                 delta.x++;
                 delta.y--;
             }
 
-            else if (RB.KeyDown(KeyCode.Z) || RB.KeyDown(KeyCode.Keypad1)) {
+            else if (RB.KeyPressed(KeyCode.Z) || RB.KeyPressed(KeyCode.Keypad1)) {
                 delta.x--;
                 delta.y++;
             }
 
-            else if (RB.KeyDown(KeyCode.C) || RB.KeyDown(KeyCode.Keypad3)) {
+            else if (RB.KeyPressed(KeyCode.C) || RB.KeyPressed(KeyCode.Keypad3)) {
                 delta.x++;
                 delta.y++;
             }
