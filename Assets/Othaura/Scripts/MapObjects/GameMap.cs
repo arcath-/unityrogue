@@ -168,6 +168,45 @@ namespace Othaura {
             }
         }
 
+        public static void SetTile(int layer, Vector2i pos, Tile tile, int rotation) {
+
+            RB.MapDataSet<Tile>(layer, pos, tile);
+            
+            if (rotation == 90) {
+
+                if (tile.sprite.id != S.EMPTY.id) {
+                    RB.MapSpriteSet(layer, pos, tile.sprite, tile.color, RB.ROT_90_CW);
+                }
+                else {                    
+                    RB.MapSpriteSet(layer, pos, RB.SPRITE_EMPTY);
+                }
+            } else if (rotation == 180) {
+                if (tile.sprite.id != S.EMPTY.id) {
+                    RB.MapSpriteSet(layer, pos, tile.sprite, tile.color, RB.ROT_180_CW);
+                }
+                else {                    
+                    RB.MapSpriteSet(layer, pos, RB.SPRITE_EMPTY);
+                }
+            } else if (rotation == 270) {
+                if (tile.sprite.id != S.EMPTY.id) {
+                    RB.MapSpriteSet(layer, pos, tile.sprite, tile.color, RB.ROT_270_CW);
+                }
+                else {
+                    RB.MapSpriteSet(layer, pos, RB.SPRITE_EMPTY);
+                }
+            } else {
+                if (tile.sprite.id != S.EMPTY.id) {
+
+                    RB.MapSpriteSet(layer, pos, tile.sprite, tile.color, RB.ROT_90_CW);
+                }
+
+                else {
+                    
+                    RB.MapSpriteSet(layer, pos, RB.SPRITE_EMPTY);
+                }
+            }        
+        }
+
         private void PlaceEntities(Rect2i room, List<Entity> entities, int maxMonstersPerRoom) {
             
             var numOfMonsters = Random.Range(0, maxMonstersPerRoom + 1);

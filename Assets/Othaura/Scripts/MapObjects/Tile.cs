@@ -60,11 +60,17 @@ namespace Othaura {
         public static readonly Tile TEMPLATE_EMPTY = new Tile(Type.EMPTY, S.EMPTY, Color.grey, false);
         public static readonly Tile TEMPLATE_VOID = new Tile(Type.VOID, S.VOID, Color.white, true);
 
-        //Dungeon Walls
-        public static readonly Tile TEMPLATE_WALL_CRYPT_NORTH = new Tile(Type.WALL, S.WALL_CRYPT_NORTH, Color.white, true);
-        public static readonly Tile TEMPLATE_WALL_CRYPT_EAST = new Tile(Type.WALL, S.WALL_CRYPT_EAST, Color.white, true);
-        public static readonly Tile TEMPLATE_WALL_CRYPT_WEST = new Tile(Type.WALL, S.WALL_CRYPT_WEST, Color.white, true);
-        public static readonly Tile TEMPLATE_WALL_CRYPT_SOUTH = new Tile(Type.WALL, S.WALL_CRYPT_SOUTH, Color.white, true);
+        // Wolf Grey Dungeon Walls
+        public static readonly Tile TEMPLATE_WALL_CRYPT_NS = new Tile(Type.WALL, S.WALL_CRYPT_NS, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_CRYPT_EW = new Tile(Type.WALL, S.WALL_CRYPT_EW, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_CRYPT_TC = new Tile(Type.WALL, S.WALL_CRYPT_TC, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_CRYPT_BC = new Tile(Type.WALL, S.WALL_CRYPT_BC, Color.white, true);
+
+        // Test Walls
+        public static readonly Tile TEMPLATE_WALL_TEST_N = new Tile(Type.WALL, S.WALL_TEST_N, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_TEST_S = new Tile(Type.WALL, S.WALL_TEST_S, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_TEST_E = new Tile(Type.WALL, S.WALL_TEST_E, Color.white, true);
+        public static readonly Tile TEMPLATE_WALL_TEST_W = new Tile(Type.WALL, S.WALL_TEST_W, Color.white, true);
     
         //Floors
         public static readonly Tile TEMPLATE_FLOOR_DIRT_BROWN = new Tile(Type.FLOOR, S.FLOOR_DIRT_BROWN, Color.white, false);

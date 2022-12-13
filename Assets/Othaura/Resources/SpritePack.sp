@@ -20,7 +20,7 @@
 SOURCE_FOLDER=Assets/Sprites
 
 // Output sprite texture width and height. If all sprites cannot fit in this space then the sprite pack
-// generation will fail...
+// generation will fail..
 OUTPUT_WIDTH=480
 OUTPUT_HEIGHT=480
 

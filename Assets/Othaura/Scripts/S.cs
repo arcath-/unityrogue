@@ -41,23 +41,23 @@ namespace Othaura {
         public static PackedSpriteID FOG = RB.PackedSpriteID("fog");
 
         /// <summary>
-        /// 
+        /// North/South facing walls
         /// </summary>
-        public static PackedSpriteID WALL_CRYPT_NORTH = RB.PackedSpriteID("crypt/tile017");
+        public static PackedSpriteID WALL_CRYPT_NS = RB.PackedSpriteID("crypt/tile13");
 
         /// <summary>
-        /// 
+        /// East West facing walls
         /// </summary>
-        public static PackedSpriteID WALL_CRYPT_EAST = RB.PackedSpriteID("crypt/tile009"); 
+        public static PackedSpriteID WALL_CRYPT_EW = RB.PackedSpriteID("crypt/tile09"); 
 
         /// <summary>
-        /// 
+        /// Top Corner
         /// </summary>
-        public static PackedSpriteID WALL_CRYPT_WEST = RB.PackedSpriteID("crypt/tile009");
+        public static PackedSpriteID WALL_CRYPT_TC = RB.PackedSpriteID("crypt/tile02");
         /// <summary>
-        /// 
+        /// Bottom Corner
         /// </summary>
-        public static PackedSpriteID WALL_CRYPT_SOUTH = RB.PackedSpriteID("crypt/tile017");
+        public static PackedSpriteID WALL_CRYPT_BC = RB.PackedSpriteID("crypt/tile06");
 
               
 
@@ -65,6 +65,25 @@ namespace Othaura {
         /// dirt floor
         /// </summary>
         public static PackedSpriteID FLOOR_DIRT_BROWN = RB.PackedSpriteID("ground_dirt_brown");
+
+
+
+        /// <summary>
+        /// Test South
+        /// </summary>
+        public static PackedSpriteID WALL_TEST_S = RB.PackedSpriteID("_s");
+        /// <summary>
+        /// Test North
+        /// </summary>
+        public static PackedSpriteID WALL_TEST_N = RB.PackedSpriteID("_n");
+        /// <summary>
+        /// Test West
+        /// </summary>
+        public static PackedSpriteID WALL_TEST_W = RB.PackedSpriteID("_w");
+        /// <summary>
+        /// Test East
+        /// </summary>
+        public static PackedSpriteID WALL_TEST_E = RB.PackedSpriteID("_e");
 
         
     }
