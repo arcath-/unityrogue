@@ -5,11 +5,20 @@ namespace Othaura {
 
     public class GameMap {
 
+        /// <summary>
+        /// Size of the map in tiles
+        /// </summary>
         public Vector2i size;
+
+        /// <summary>
+        /// The tiles that make up the map
+        /// </summary>
+        public readonly Tile[,] terrain;
 
         public GameMap(Vector2i size) {
 
             this.size = size;
+            terrain = new Tile[size.width, size.height];
             InitializeTiles();
         }
 
@@ -20,14 +29,21 @@ namespace Othaura {
 
                 for (int y = 0; y < size.height; y++) {
 
-                    SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_WALL_BRICK));
+                    SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_VOID));
                 }
             }
         }
 
         public bool IsBlocked(Vector2i pos) {
 
+            if (pos.x < 0 || pos.y < 0 || pos.x >= size.width || pos.y >= size.height) {
+                
+                return true;
+            }
+
             var tile = RB.MapDataGet<Tile>(C.LAYER_TERRAIN, pos);
+            //var tile = terrain[pos.x, pos.y];
+            
             if (tile != null && tile.blocked) {
 
                 return true;
@@ -36,7 +52,7 @@ namespace Othaura {
             return false;
         }
 
-        public void MakeMap(int maxRooms, int roomMinSize, int roomMaxSize, int mapWidth, int mapHeight, Entity player) {
+        public void MakeMap(int maxRooms, int roomMinSize, int roomMaxSize, int mapWidth, int mapHeight, Entity player, List<Entity> entities, int maxMonstersPerRoom) {
 
             List<Rect2i> rooms = new List<Rect2i>();
             
@@ -94,10 +110,14 @@ namespace Othaura {
                         }
                     }
 
+                    PlaceEntities(newRoom, entities, maxMonstersPerRoom);
+
                     // Add the new room to list of rooms
                     rooms.Add(newRoom);
                 }
             }
+            
+            BitMasking.BeautifyMap(C.MAP_WIDTH, C.MAP_HEIGHT, C.LAYER_TERRAIN, rooms);
         }
 
         private void CreateRoom(Rect2i room) {
@@ -106,7 +126,7 @@ namespace Othaura {
 
                 for (int x = room.x + 1; x < room.max.x; x++) {
 
-                    SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_COBBLESTONE));
+                    SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_DIRT_BROWN));
                 }
             }
         }
@@ -118,7 +138,7 @@ namespace Othaura {
 
             for (int x = xStart; x <= xEnd; x++) {
 
-                SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_COBBLESTONE));
+                SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_DIRT_BROWN));
             }
         }
 
@@ -129,11 +149,11 @@ namespace Othaura {
 
             for (int y = yStart; y <= yEnd; y++) {
 
-                SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_COBBLESTONE));
+                SetTile(C.LAYER_TERRAIN, new Vector2i(x, y), new Tile(Tile.TEMPLATE_FLOOR_DIRT_BROWN));
             }
         }
 
-        private void SetTile(int layer, Vector2i pos, Tile tile) {
+        public static void SetTile(int layer, Vector2i pos, Tile tile) {
 
             RB.MapDataSet<Tile>(layer, pos, tile);
 
@@ -148,7 +168,45 @@ namespace Othaura {
             }
         }
 
+        private void PlaceEntities(Rect2i room, List<Entity> entities, int maxMonstersPerRoom) {
+            
+            var numOfMonsters = Random.Range(0, maxMonstersPerRoom + 1);
 
+            for (int i = 0; i < numOfMonsters; i++) {
+
+                var randomPos = new Vector2i(
+                    Random.Range(room.min.x + 1, room.max.x),
+                    Random.Range(room.min.y + 1, room.max.y));
+
+                bool exists = false;
+
+                for (int j = 0; j < entities.Count; j++) {
+
+                    if (entities[j].pos == randomPos) {
+
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+
+                    Entity monster;
+
+                    if (Random.Range(0, 100) < 80) {
+
+                        monster = new Entity(randomPos, S.RAT, new Color32(0xc0, 0x79, 0x58, 255), C.FSTR.Clear().Append("Rat"), true);
+                    }
+
+                    else {
+
+                        monster = new Entity(randomPos, S.SKELETON, new Color32(0xdb, 0xd3, 0xc3, 255), C.FSTR.Clear().Append("Skeleton"), true);
+                    }
+
+                    entities.Add(monster);
+                }
+            }
+        }       
     }
 }
 

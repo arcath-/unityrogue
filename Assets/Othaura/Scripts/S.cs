@@ -9,14 +9,20 @@ namespace Othaura {
     public static class S {
         
         /// <summary>
-        /// Colored Hero 1 24x24
+        /// Hero 16x16
         /// </summary>
-        public static PackedSpriteID HERO1 = RB.PackedSpriteID("hero1");
+        public static PackedSpriteID HERO1 = RB.PackedSpriteID("warrior_m_1");
+
+        //Monsters
+        /// <summary>
+        /// Rat 24x24
+        /// </summary>
+        public static PackedSpriteID RAT = RB.PackedSpriteID("rat_1");
 
         /// <summary>
-        /// Colored Hero 2 24x24
+        /// skeleton 24x24
         /// </summary>
-        public static PackedSpriteID HERO2 = RB.PackedSpriteID("hero2");
+        public static PackedSpriteID SKELETON = RB.PackedSpriteID("skeleton_1");
 
         /// <summary>
         /// Empty Space
@@ -24,16 +30,43 @@ namespace Othaura {
         public static PackedSpriteID EMPTY = new PackedSpriteID(0);
 
         /// <summary>
-        /// Cracked Brick wall
+        /// Void Space
         /// </summary>
-        public static PackedSpriteID WALL_BRICK01 = RB.PackedSpriteID("wallStoneLeftRight01");
+        public static PackedSpriteID VOID = RB.PackedSpriteID("voidSpace01");
+        //public static PackedSpriteID VOID = RB.PackedSpriteID("Grey01/GreyWall01");
 
         /// <summary>
-        /// cobblestone floor
+        /// Fog
         /// </summary>
-        public static PackedSpriteID FLOOR_COBBLESTONE01 = RB.PackedSpriteID("floorCobblestoneBrown01");
+        public static PackedSpriteID FOG = RB.PackedSpriteID("fog");
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static PackedSpriteID WALL_CRYPT_NORTH = RB.PackedSpriteID("crypt/tile017");
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static PackedSpriteID WALL_CRYPT_EAST = RB.PackedSpriteID("crypt/tile009"); 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static PackedSpriteID WALL_CRYPT_WEST = RB.PackedSpriteID("crypt/tile009");
+        /// <summary>
+        /// 
+        /// </summary>
+        public static PackedSpriteID WALL_CRYPT_SOUTH = RB.PackedSpriteID("crypt/tile017");
+
+              
+
+        /// <summary>
+        /// dirt floor
+        /// </summary>
+        public static PackedSpriteID FLOOR_DIRT_BROWN = RB.PackedSpriteID("ground_dirt_brown");
+
+        
     }
 }
 

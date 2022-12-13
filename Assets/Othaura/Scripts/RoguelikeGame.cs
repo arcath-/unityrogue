@@ -1,10 +1,11 @@
 namespace Othaura {
 
-    using System;
-    using System.Collections;
+    //using System;
+    //using System.Collections;
     using System.Collections.Generic;
-
+    
     using UnityEngine;
+    
 
     /// <summary>
     /// Othaura
@@ -13,19 +14,31 @@ namespace Othaura {
 
         public Assets assets = new Assets();
 
+        private const int ROOM_MIN_SIZE = 6;
+        private const int ROOM_MAX_SIZE = 10;
+        private const int MAX_ROOMS = 30;
+        private const int MAX_MONSTERS_PER_ROOM = 3;
+
         private Entity mPlayer;
         private Entity mNPC;
         private List<Entity> mEntities;
 
+        private int mFOVRadius;
+        private bool mFOVRecompute = true;
+
         private GameMap mGameMap; 
 
-        private Camera mCamera;       
+        //private Console mConsole;
 
-        // refactor these into C.cs
-        private const int ROOM_MIN_SIZE = 6;
-        private const int ROOM_MAX_SIZE = 10;
-        private const int MAX_ROOMS = 30;
+        private Camera mCamera; 
 
+        private GameState mGameState;
+
+        private enum GameState
+        {
+            PLAYER_TURN,
+            ENEMY_TURN
+        }
 
         /// <summary>
         /// Query hardware. Here you initialize your retro game hardware.
@@ -64,44 +77,39 @@ namespace Othaura {
             C.SCREEN_WIDTH = RB.DisplaySize.width / assets.spriteSheet.grid.cellSize.width;
             C.SCREEN_HEIGHT = RB.DisplaySize.height / assets.spriteSheet.grid.cellSize.height;
 
-            //why are these /2?
-            mPlayer = new Entity(new Vector2i (C.SCREEN_WIDTH/2, C.SCREEN_HEIGHT/2), S.HERO1, Color.white);
-            mNPC = new Entity(new Vector2i (C.SCREEN_WIDTH/2, C.SCREEN_HEIGHT/2), S.HERO2, Color.white);
+            Console.Initialize(new Vector2i(RB.DisplaySize.width / 2, RB.DisplaySize.height / 3));
+            //mConsole = new Console(new Vector2i(RB.DisplaySize.width / 2, RB.DisplaySize.height / 3));
 
+             // Set FOV radius to the whole screen
+            mFOVRadius = C.SCREEN_WIDTH / 2 + 2;
+
+            //why are these /2?
+            mPlayer = new Entity(new Vector2i (C.SCREEN_WIDTH/2, C.SCREEN_HEIGHT/2), S.HERO1, Color.white,C.FSTR.Clear().Append("Player"));
+            
             mEntities = new List<Entity>();
             mEntities.Add(mPlayer);
-            mEntities.Add(mNPC);
-
+            
             // make the map
             mGameMap = new GameMap(new Vector2i(C.MAP_WIDTH, C.MAP_HEIGHT));
-            mGameMap.MakeMap(MAX_ROOMS, ROOM_MIN_SIZE, ROOM_MAX_SIZE, C.MAP_WIDTH, C.MAP_HEIGHT, mPlayer);
+            mGameMap.MakeMap(MAX_ROOMS, ROOM_MIN_SIZE, ROOM_MAX_SIZE, C.MAP_WIDTH, C.MAP_HEIGHT, mPlayer, mEntities, MAX_MONSTERS_PER_ROOM);
+            //BitMasking.BeautifyMap(mGameMap);
             
+            //FOV init
+            FOVFunctions.InitializeFOV(mGameMap);
+            mFOVRecompute = true;
 
             // set the camera 
             mCamera = new Camera();
             mCamera.SetPos(mPlayer);
 
-            // Temporarily place enemy somewhere valid
-            int attempts = 1000;
-            while (attempts > 0)
-            {
-                var pos = new Vector2i(UnityEngine.Random.Range(0, C.MAP_WIDTH), UnityEngine.Random.Range(0, C.MAP_HEIGHT));
-                var tile = RB.MapDataGet<Tile>(C.LAYER_TERRAIN, pos);
-                if (tile != null && tile.blocked == false && pos != mPlayer.pos)
-                {
-                    mNPC.pos = pos;
-                    break;
-                }
-
-                attempts--;
-            }
-
-
             //Setting the map sprite sheets according to layer.   
-            RB.MapLayerSpriteSheetSet(C.LAYER_TERRAIN, assets.spriteSheet); 
+            RB.MapLayerSpriteSheetSet(C.LAYER_TERRAIN, assets.spriteSheet);
+            RB.MapLayerSpriteSheetSet(C.LAYER_VISIBILITY, assets.spriteSheet); 
             
             // Collect any garbage created during initilization to avoid a performance hiccup later.
             System.GC.Collect();
+
+            mGameState = GameState.PLAYER_TURN;
 
             return true;
 
@@ -116,6 +124,35 @@ namespace Othaura {
             if (RB.KeyPressed(KeyCode.Escape)) {
                 Application.Quit();
             }
+
+            if (mGameState == GameState.PLAYER_TURN)
+            {
+                if (DoPlayerTurn())
+                {
+                    mGameState = GameState.ENEMY_TURN;
+                }
+            }
+            else
+            {
+                DoEnemyTurn();
+                mGameState = GameState.PLAYER_TURN;
+            }
+            
+
+            mCamera.Follow(mPlayer);
+
+            if (mFOVRecompute) {
+
+                FOVFunctions.RecomputeFov(mGameMap, mPlayer, mFOVRadius);
+                mFOVRecompute = false;
+            }
+        }
+
+        /// <summary>
+        /// Do players turn, return true is player moved
+        /// </summary>
+        /// <returns>True if moved</returns>
+        public bool DoPlayerTurn() {
 
             Vector2i delta = Vector2i.zero;
 
@@ -156,26 +193,62 @@ namespace Othaura {
                 delta.y++;
             }
 
-            // Only move if way is clear
-            if (!mGameMap.IsBlocked(mPlayer.pos + delta))
-            {
-                mPlayer.Move(delta);
+            // Only move if way is clear, may cause an enemy turn if you run into a wall
+            // TODO: test this
+            if ((delta.x != 0 || delta.y != 0) && !mGameMap.IsBlocked(mPlayer.pos + delta)) {
+
+                var destPos = mPlayer.pos + delta;
+                var targetEntity = EntityFunctions.GetBlockingEntityAtPos(mEntities, destPos);
+
+                if (targetEntity != null) {
+
+                    Console.Log(C.FSTR.Clear().Append("You kick the @FFFF50").Append(targetEntity.name)
+                    .Append("@- in the shins, much to its annoyance!"));
+                }
+
+                else {
+
+                    mPlayer.Move(delta);
+                    mFOVRecompute = true;
+                }
+                return true;
+
             }
-
-            mCamera.Follow(mPlayer);
-
-
+            return false;
         }
+
+        /// <summary>
+        /// Do enemy turn...
+        /// </summary>
+        public void DoEnemyTurn() {
+
+            for (int i = 0; i < mEntities.Count; i++) {
+
+                var entity = mEntities[i];
+                if (entity != mPlayer) {
+
+                    if (Random.Range(0, 200 + 1) > 199) {
+                        Console.Log(C.FSTR.Clear().Append("The @FFFF50").Append(entity.name)
+                        .Append("@- ponders the meaning of its existence."));
+                    }
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Render, your drawing code should go here.
         /// </summary>
         public void Render() {
 
-            RB.Clear(new Color32(0x47, 0x2d, 0x3c, 255));
+            RB.Clear(C.COLOR_BACKGROUND);
                      
             mCamera.Apply();
-            RenderFunctions.RenderAll(mEntities);
+            RenderFunctions.RenderAll(mGameMap, mEntities);
+
+            RB.CameraReset();
+            Console.Render();
             
         }
     }
